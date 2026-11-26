@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fdf7f7; /* Soft blush */
+  --foreground: #4a3a3a; /* Dark brown/mauve */
+  --accent: #be3a6c;    /* Wine-pink */
+  --accent-light: #fce8f0;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
+  --font-sans: "Inter", sans-serif;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  background-image: url('/img/fundo.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.content-wrapper {
+  background-color: rgba(253, 247, 247, 0.85);
+  backdrop-filter: blur(8px);
+  min-height: 100vh;
+}
