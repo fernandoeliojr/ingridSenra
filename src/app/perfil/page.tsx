@@ -22,18 +22,22 @@ export default function PerfilPage() {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-xl font-bold mb-6">Perfil da Manicure</h1>
-      <div className="flex flex-col items-center gap-4">
-        <div className="w-32 h-32 rounded-full bg-gray-200 overflow-hidden border-2 border-[#be3a6c]">
-            {foto ? (
-              <img src={foto} alt="Sua foto" className="w-full h-full object-cover" />
-            ) : (
-              <div className="flex items-center justify-center h-full text-gray-500">Sem foto</div>
-            )}
+    <div className="p-6 pb-24">
+      <h1 className="text-xl font-bold mb-6 text-[#351d28]">Perfil da Manicure</h1>
+      <div className="bg-white/90 backdrop-blur-md p-6 rounded-3xl shadow-sm border border-pink-100/60 flex flex-col items-center gap-5">
+        <div className="w-32 h-32 rounded-full bg-pink-50 overflow-hidden border-3 border-[#be3a6c] shadow-md">
+          {foto ? (
+            <img src={foto} alt="Sua foto" className="w-full h-full object-cover" />
+          ) : (
+            <div className="flex items-center justify-center h-full text-[#be3a6c] font-bold text-2xl">IS</div>
+          )}
         </div>
-        <label className="cursor-pointer bg-[#be3a6c] text-white px-4 py-2 rounded-lg text-sm font-semibold">
-          Alterar foto
+        <div className="text-center">
+          <h2 className="font-bold text-lg text-[#351d28]">Ingrid Senra</h2>
+          <p className="text-xs text-[#876e78]">Espaço Ingrid Senra Manicure</p>
+        </div>
+        <label className="cursor-pointer bg-gradient-to-r from-[#ce3a6f] via-[#be3a6c] to-[#a62a56] text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm hover:opacity-95 transition">
+          Alterar foto de perfil
           <input type="file" onChange={handleImageChange} className="hidden" accept="image/*" />
         </label>
       </div>

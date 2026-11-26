@@ -45,7 +45,7 @@ export default function AgendamentosPage() {
 
     const totalDuration = services
       .filter(s => selectedServiceIds.includes(s.id))
-      .reduce((acc, s) => acc + s.duration, 0);
+      .reduce((acc, s) => acc + (s.duration_minutes || s.duration || 0), 0);
 
     if (totalDuration === 0) {
       alert('Selecione pelo menos um serviço.');
@@ -107,19 +107,25 @@ export default function AgendamentosPage() {
       <h1 className="text-xl font-bold mb-4">Agenda</h1>
 
       {/* Calendário */}
-      <div className="bg-white p-4 rounded-2xl shadow-sm mb-6">
+      <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-sm border border-pink-100/60 mb-6">
         <div className="flex justify-between items-center mb-4">
-          <button onClick={() => setCurrentDate(subMonths(currentDate, 1))}>&lt;</button>
-          <h2 className="font-bold capitalize">{format(currentDate, 'MMMM yyyy', { locale: ptBR })}</h2>
-          <button onClick={() => setCurrentDate(addMonths(currentDate, 1))}>&gt;</button>
+          <button onClick={() => setCurrentDate(subMonths(currentDate, 1))} className="p-1 text-[#be3a6c] font-bold">&lt;</button>
+          <h2 className="font-bold capitalize text-[#351d28]">{format(currentDate, 'MMMM yyyy', { locale: ptBR })}</h2>
+          <button onClick={() => setCurrentDate(addMonths(currentDate, 1))} className="p-1 text-[#be3a6c] font-bold">&gt;</button>
         </div>
         <div className="grid grid-cols-7 gap-1 text-center text-xs">
-          {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(d => <div key={d} className="font-bold text-gray-400">{d}</div>)}
+          {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(d => <div key={d} className="font-bold text-gray-400 py-1">{d}</div>)}
           {days.map(day => (
             <button
               key={day.toString()}
               onClick={() => setSelectedDate(day)}
-              className={`p-2 rounded-full ${isSameDay(day, selectedDate) ? 'bg-pink-600 text-white' : 'hover:bg-pink-100'}`}
+              className={`p-2 rounded-full font-medium transition ${
+                isSameDay(day, selectedDate)
+                  ? 'bg-gradient-to-r from-[#ce3a6f] to-[#be3a6c] text-white shadow-sm'
+                  : (day.getDay() === 0 || day.getDay() === 1)
+                  ? 'text-gray-300 hover:bg-pink-50'
+                  : 'text-[#351d28] hover:bg-pink-100/70'
+              }`}
             >
               {format(day, 'd')}
             </button>
@@ -128,41 +134,63 @@ export default function AgendamentosPage() {
       </div>
 
       {/* Formulário */}
-      <form onSubmit={handleAddAppointment} className="bg-white p-4 rounded-2xl shadow-sm space-y-3 mb-6">
-        <h3 className="font-bold">Novo Agendamento ({format(selectedDate, 'dd/MM')})</h3>
-        <input placeholder="Nome da cliente" value={clientName} onChange={e => setClientName(e.target.value)} className="w-full p-3 rounded-lg border" required />
+      <form onSubmit={handleAddAppointment} className="bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-sm border border-pink-100/60 space-y-3 mb-6">
+        <h3 className="font-bold text-[#351d28]">Novo Agendamento ({format(selectedDate, 'dd/MM')})</h3>
+        <input
+          placeholder="Nome da cliente"
+          value={clientName}
+          onChange={e => setClientName(e.target.value)}
+          className="w-full p-3 rounded-xl border border-pink-100 bg-white/80 focus:outline-none focus:ring-2 focus:ring-[#be3a6c]/30 text-sm"
+          required
+        />
 
-        <div className="space-y-2 border p-3 rounded-lg">
-          <p className="text-sm font-semibold">Serviços:</p>
-          {services.map(s => (
-            <label key={s.id} className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={selectedServiceIds.includes(s.id)}
-                onChange={e => {
-                  if (e.target.checked) setSelectedServiceIds([...selectedServiceIds, s.id]);
-                  else setSelectedServiceIds(selectedServiceIds.filter(id => id !== s.id));
-                }}
-              />
-              {s.name} ({s.duration} min)
-            </label>
-          ))}
+        <div className="space-y-2 border border-pink-100 bg-white/60 p-3 rounded-xl">
+          <p className="text-xs font-semibold text-[#876e78] uppercase tracking-wide">Selecione os Serviços:</p>
+          {services.length === 0 ? (
+            <p className="text-xs text-gray-400">Nenhum serviço cadastrado.</p>
+          ) : (
+            services.map(s => (
+              <label key={s.id} className="flex items-center gap-2.5 text-sm cursor-pointer py-1">
+                <input
+                  type="checkbox"
+                  className="rounded text-[#be3a6c] focus:ring-[#be3a6c] accent-[#be3a6c]"
+                  checked={selectedServiceIds.includes(s.id)}
+                  onChange={e => {
+                    if (e.target.checked) setSelectedServiceIds([...selectedServiceIds, s.id]);
+                    else setSelectedServiceIds(selectedServiceIds.filter(id => id !== s.id));
+                  }}
+                />
+                <span className="text-[#351d28]">{s.name} ({s.duration_minutes || s.duration} min)</span>
+              </label>
+            ))
+          )}
         </div>
 
-        <input type="time" value={time} onChange={e => setTime(e.target.value)} className="w-full p-3 rounded-lg border" required />
-        <button type="submit" className="w-full py-3 bg-pink-600 text-white rounded-lg font-bold">Confirmar</button>
+        <input
+          type="time"
+          value={time}
+          onChange={e => setTime(e.target.value)}
+          className="w-full p-3 rounded-xl border border-pink-100 bg-white/80 focus:outline-none focus:ring-2 focus:ring-[#be3a6c]/30 text-sm"
+          required
+        />
+        <button
+          type="submit"
+          className="w-full py-3 bg-gradient-to-r from-[#ce3a6f] via-[#be3a6c] to-[#a62a56] text-white rounded-xl font-bold shadow-md hover:opacity-95 transition"
+        >
+          Confirmar Agendamento
+        </button>
       </form>
 
       {/* Resumo do dia atual */}
       {agendamentosHoje.length > 0 && (
-        <div className="bg-white p-4 rounded-2xl shadow-sm mb-6">
-          <h3 className="font-bold mb-4">Resumo de Hoje ({format(hoje, 'dd/MM')})</h3>
+        <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-sm border border-pink-100/60 mb-6">
+          <h3 className="font-bold mb-4 text-[#351d28]">Resumo de Hoje ({format(hoje, 'dd/MM')})</h3>
           <div className="space-y-3">
             {agendamentosHoje
               .sort((a, b) => new Date(a.appointment_date).getTime() - new Date(b.appointment_date).getTime())
               .map(a => (
                 <div key={a.id} className="flex items-center gap-3 py-2 border-b border-pink-100 last:border-0">
-                  <span className="text-xs font-bold text-pink-600 bg-pink-50 px-2 py-1 rounded">
+                  <span className="text-xs font-bold text-[#be3a6c] bg-pink-50 border border-pink-200 px-2.5 py-1 rounded-lg">
                     {format(new Date(a.appointment_date), 'HH:mm')}
                   </span>
                   <span className="font-semibold text-sm text-[#422c36]">
